@@ -23,7 +23,7 @@ public class RestFullController {
     private String port;
     @RequestMapping("/resp")
     public String get(){
-        System.out.println(1/0);
+//        System.out.println(1/0);
         logger.info("通过ribbon+restful形式消费。。。。。端口：{}",port);
         return "通过ribbon+restful形式消费。。。。。端口"+port;
     }

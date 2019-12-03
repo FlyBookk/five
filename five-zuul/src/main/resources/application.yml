@@ -7,11 +7,18 @@ server:
 spring:
   application:
     name: five-zuul
+
+# zuul路由时如果过滤完毕会自动去掉前缀再请求实际的地址,
+# 如请求地址:http://localhost:8086/feign-zuul/feign/comsumer/get?token=222,
+# 路由后的实际地址:http://localhost:8086/feign/comsumer/get?token=222
 zuul:
   routes:
-    api-a:
-      path: /feign/**
-      serviceId: rest-ribbon
-    api-b:
-      path: /ribbon/**
+    feign-zuul:
+      path: /feign-zuul/**
       serviceId: five-feign
+    ribbon-zuul:
+      path: /ribbon-zuul/**
+      serviceId: rest-ribbon
+  host:
+    socket-timeout-millis: 600000
+    connect-timeout-millis: 600000

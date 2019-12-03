@@ -1,7 +1,15 @@
 package com.liuzq.fivezuul.filter;
 
 import com.netflix.zuul.ZuulFilter;
+import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 /**
  * @ProjectName: five
@@ -20,7 +28,9 @@ import com.netflix.zuul.exception.ZuulException;
  * shouldFilter：这里可以写逻辑判断，是否要过滤，本文true,永远过滤。
  * run：过滤器的具体逻辑。可用很复杂，包括查sql，nosql去判断该请求到底有没有权限访问。
  * */
+@Component
 public class MyFilter extends ZuulFilter {
+    Logger logger= LoggerFactory.getLogger(MyFilter.class);
     @Override
     public String filterType() {
         return "pre";
@@ -38,6 +48,23 @@ public class MyFilter extends ZuulFilter {
 
     @Override
     public Object run() throws ZuulException {
+        RequestContext ctx = RequestContext.getCurrentContext();
+        HttpServletRequest request = ctx.getRequest();
+        try {
+            request.setCharacterEncoding("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            logger.error("",e);
+        }
+        String token = request.getParameter("token");
+        if (StringUtils.isBlank(token)) {
+            logger.info("zuul路由失败,token为空!");
+            ctx.setSendZuulResponse(false);
+            try {
+                ctx.getResponse().getWriter().write("token is empty");
+            } catch (IOException e) {
+                logger.error("",e);
+            }
+        }
         return null;
     }
 }
